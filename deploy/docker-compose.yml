@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: "bitnami/postgresql:15.3.0"  # FlyWay не поддерживает Postgres версии выше 15.3
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    ports:
+      - "5432:5432"
+    container_name: postgres_db
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:

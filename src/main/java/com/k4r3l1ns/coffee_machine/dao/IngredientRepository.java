@@ -1,7 +1,6 @@
 package com.k4r3l1ns.coffee_machine.dao;
 
 import com.k4r3l1ns.coffee_machine.models.Ingredient;
-import org.postgresql.util.PSQLException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

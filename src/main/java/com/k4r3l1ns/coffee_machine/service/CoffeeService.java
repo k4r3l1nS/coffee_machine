@@ -2,6 +2,7 @@ package com.k4r3l1ns.coffee_machine.service;
 
 import com.k4r3l1ns.coffee_machine.dao.*;
 import com.k4r3l1ns.coffee_machine.dto.CoffeeInfo;
+import com.k4r3l1ns.coffee_machine.dto.OrderDto;
 import com.k4r3l1ns.coffee_machine.dto.RecipeDto;
 import com.k4r3l1ns.coffee_machine.models.Coffee;
 import com.k4r3l1ns.coffee_machine.models.CoffeeIngredientTable;
@@ -9,6 +10,8 @@ import com.k4r3l1ns.coffee_machine.models.Order;
 import com.k4r3l1ns.coffee_machine.models.PriceList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,11 @@ public class CoffeeService {
 
     @Value("${coffee.portion-coefficient.max-value}")
     private double maxPortionValue;
+
+    @Value("${kafka.topic}")
+    private String topic;
+
+    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
     private final CoffeeRepository coffeeRepository;
     private final PriceListRepository priceListRepository;
@@ -70,32 +78,27 @@ public class CoffeeService {
     /**
      * Отправить кофе в очередь сообщений Kafka
      *
-     * @param name Название кофе
-     * @param portionCoefficient Количество порций кофе
+     * @param orderDto Содержит название кофе и количество порций кофе
      */
-    public void sendToQueue(
-            String name,
-            double portionCoefficient
-    ) {
-        if (portionCoefficient <= 0 || portionCoefficient > maxPortionValue) {
-            throw new IllegalArgumentException("Invalid portion coefficient: " + portionCoefficient);
+    public void sendToQueue(OrderDto orderDto) {
+        orderDto.throwIfInvalid();
+        if (orderDto.getPortionCoefficient() <= 0 || orderDto.getPortionCoefficient() > maxPortionValue) {
+            throw new IllegalArgumentException("Invalid portion coefficient: " + orderDto.getPortionCoefficient());
         }
-        // todo -> Отправка в Kafka
+        kafkaTemplate.send(topic, orderDto);
     }
 
     /**
      * Приготовление кофе по названию и количеству порций
      *
-     * @param name Название кофе
-     * @param portionCoefficient Количество порций кофе
+     * @param orderDto Содержит название кофе и количество порций кофе
      */
-    public void makeCoffee(
-            String name,
-            double portionCoefficient
-    ) {
-        var coffee = coffeeRepository.findByName(name);
+    @KafkaListener(topics = "${kafka.topic}")
+    public void makeCoffee(OrderDto orderDto) {
+
+        var coffee = coffeeRepository.findByName(orderDto.getCoffeeName());
         if (coffee == null) {
-            throw new NoSuchElementException("Coffee \"" + name + "\" not found");
+            throw new NoSuchElementException("Coffee \"" + orderDto.getCoffeeName() + "\" not found");
         }
         var ingredientList = ingredientRepository.findByCoffeeId(coffee.getId());
 
@@ -109,7 +112,7 @@ public class CoffeeService {
             var requiredValue = coffeeIngredientTableRepository.getIngredientValueByIds(
                     coffee.getId(),
                     ingredient.getId()
-            ) * portionCoefficient;
+            ) * orderDto.getPortionCoefficient();
             var residualValue = ingredient.getResidualValue();
             if (residualValue < requiredValue) {
                 failedIngredientMap.put(
@@ -135,7 +138,7 @@ public class CoffeeService {
         // Составим и сохраним заказ
         Order order = new Order();
         order.setCoffee(coffee);
-        order.setPortionCoefficient(portionCoefficient);
+        order.setPortionCoefficient(orderDto.getPortionCoefficient());
         orderRepository.save(order);
     }
 

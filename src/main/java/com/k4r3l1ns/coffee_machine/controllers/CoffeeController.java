@@ -1,6 +1,7 @@
 package com.k4r3l1ns.coffee_machine.controllers;
 
 import com.k4r3l1ns.coffee_machine.dto.CoffeeInfo;
+import com.k4r3l1ns.coffee_machine.dto.OrderDto;
 import com.k4r3l1ns.coffee_machine.dto.RecipeDto;
 import com.k4r3l1ns.coffee_machine.service.CoffeeService;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,9 @@ public class CoffeeController {
 
     @PostMapping("/make")
     public ResponseEntity<String> makeCoffee(
-            @RequestParam String name,
-            @RequestParam double portionCoefficient
+            @RequestBody OrderDto orderDto
     ) {
-        coffeeService.sendToQueue(name, portionCoefficient);
+        coffeeService.sendToQueue(orderDto);
         return ResponseEntity.ok("Order is processed and sent to the queue");
     }
 

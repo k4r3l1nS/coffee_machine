@@ -1,0 +1,30 @@
+spring:
+
+  application:
+    name: coffee_machine
+
+  # Database & JPA properties
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+# Controller urls
+coffee:
+  # Max portion of coffee
+  portion-coefficient:
+    max-value: 5
+  url: api/v1/coffee
+ingredient:
+  url: api/v1/ingredient
+statistics:
+  url: api/v1/stats
+
+kafka:
+  topic: coffee

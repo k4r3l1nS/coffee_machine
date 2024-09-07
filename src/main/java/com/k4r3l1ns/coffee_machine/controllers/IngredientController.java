@@ -69,7 +69,7 @@ public class IngredientController {
             })
     @DeleteMapping
     public ResponseEntity<String> deleteIngredient(
-            @RequestParam String name
+            @RequestParam(name = "name") String name
     ) {
         ingredientService.delete(name);
         return ResponseEntity.ok("Ingredient successfully deleted");
@@ -98,8 +98,8 @@ public class IngredientController {
             })
     @PostMapping("/residual/increase")
     public ResponseEntity<String> increaseResiduals(
-            @RequestParam String ingredientName,
-            @RequestParam double incrementedAmount
+            @RequestParam(name = "ingredientName") String ingredientName,
+            @RequestParam(name = "incrementedAmount") double incrementedAmount
     ) {
         ingredientService.increaseResiduals(
                 ingredientName,
@@ -127,7 +127,7 @@ public class IngredientController {
             })
     @GetMapping("/residual")
     public ResponseEntity<String> getResiduals(
-            @RequestParam String ingredientName
+            @RequestParam(name = "ingredientName") String ingredientName
     ) {
         return ResponseEntity.ok(
                 "Residual for " + ingredientName + ": " + ingredientService.getResiduals(ingredientName)

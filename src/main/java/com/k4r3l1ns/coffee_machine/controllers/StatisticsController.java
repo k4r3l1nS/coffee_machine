@@ -33,7 +33,7 @@ public class StatisticsController {
             })
     @GetMapping("/most-ordered-coffee")
     public ResponseEntity<List<StatisticsDto>> getMostOrderedCoffee(
-            @RequestParam(defaultValue = "1") int count
+            @RequestParam(name = "count", defaultValue = "1") int count
     ) {
         return ResponseEntity.ok(statisticsService.mostOrderedCoffee(count));
     }
@@ -50,7 +50,7 @@ public class StatisticsController {
             })
     @GetMapping("/most-profitable-coffee")
     public ResponseEntity<List<StatisticsDto>> getProfitableCoffee(
-            @RequestParam(defaultValue = "1") int count
+            @RequestParam(name = "count", defaultValue = "1") int count
     ) {
         return ResponseEntity.ok(statisticsService.mostProfitableCoffee(count));
     }
@@ -67,7 +67,7 @@ public class StatisticsController {
             })
     @GetMapping("/most-served-coffee")
     public ResponseEntity<List<StatisticsDto>> getMostServedCoffee(
-            @RequestParam(defaultValue = "1") int count
+            @RequestParam(name = "count", defaultValue = "1") int count
     ) {
         return ResponseEntity.ok(statisticsService.mostServedCoffee(count));
     }

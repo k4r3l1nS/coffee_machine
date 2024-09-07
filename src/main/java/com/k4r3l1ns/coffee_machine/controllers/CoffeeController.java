@@ -37,7 +37,9 @@ public class CoffeeController {
                     @ApiResponse(responseCode = "404", description = "Кофе не найден")
             })
     @GetMapping
-    public ResponseEntity<CoffeeInfo> getCoffeeInfo(String name) {
+    public ResponseEntity<CoffeeInfo> getCoffeeInfo(
+            @RequestParam(name = "name") String name
+    ) {
         return ResponseEntity.ok(coffeeService.coffeeInfo(name));
     }
 
@@ -102,7 +104,7 @@ public class CoffeeController {
             })
     @DeleteMapping
     public ResponseEntity<String> deleteRecipe(
-            @RequestParam String name
+            @RequestParam(name = "name") String name
     ) {
         coffeeService.deleteRecipe(name);
         return ResponseEntity.ok("Recipe was successfully deleted");

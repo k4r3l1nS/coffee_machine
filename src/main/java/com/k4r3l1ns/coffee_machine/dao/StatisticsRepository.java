@@ -3,6 +3,7 @@ package com.k4r3l1ns.coffee_machine.dao;
 import com.k4r3l1ns.coffee_machine.models.Statistics;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface StatisticsRepository extends JpaRepository<Statistics, Long> {
                 LIMIT :count
             """
     )
-    List<Statistics> mostOrderedCoffee(int count);
+    List<Statistics> mostOrderedCoffee(@Param("count") int count);
 
     @Query(
             """
@@ -30,7 +31,7 @@ public interface StatisticsRepository extends JpaRepository<Statistics, Long> {
                 LIMIT :count
             """
     )
-    List<Statistics> mostProfitableCoffee(int count);
+    List<Statistics> mostProfitableCoffee(@Param("count") int count);
 
     @Query(
             """
@@ -41,5 +42,5 @@ public interface StatisticsRepository extends JpaRepository<Statistics, Long> {
                 LIMIT :count
             """
     )
-    List<Statistics> mostServedCoffee(int count);
+    List<Statistics> mostServedCoffee(@Param("count") int count);
 }

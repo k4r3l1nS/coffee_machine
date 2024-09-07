@@ -3,6 +3,7 @@ package com.k4r3l1ns.coffee_machine.dao;
 import com.k4r3l1ns.coffee_machine.models.Ingredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
                 WHERE CIT.coffee.id = :id
             """
     )
-    List<Ingredient> findByCoffeeId(Long id);
+    List<Ingredient> findByCoffeeId(@Param("id")Long id);
 
     boolean existsByIngredientName(String ingredientName);
 

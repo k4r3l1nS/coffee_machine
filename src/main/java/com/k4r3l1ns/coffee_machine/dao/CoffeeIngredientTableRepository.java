@@ -4,6 +4,7 @@ import com.k4r3l1ns.coffee_machine.models.CoffeeIngredientTable;
 import com.k4r3l1ns.coffee_machine.models.Ingredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,7 +18,7 @@ public interface CoffeeIngredientTableRepository extends JpaRepository<CoffeeIng
                   AND CIT.ingredient.id = :ingredientId
             """
     )
-    double getIngredientValueByIds(Long coffeeId, Long ingredientId);
+    double getIngredientValueByIds(@Param("coffeeId") Long coffeeId, @Param("ingredientId") Long ingredientId);
 
     boolean existsByIngredient(Ingredient ingredient);
 }

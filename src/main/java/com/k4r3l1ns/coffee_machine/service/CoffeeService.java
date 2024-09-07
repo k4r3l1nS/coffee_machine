@@ -9,6 +9,7 @@ import com.k4r3l1ns.coffee_machine.models.CoffeeIngredientTable;
 import com.k4r3l1ns.coffee_machine.models.Order;
 import com.k4r3l1ns.coffee_machine.models.PriceList;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,6 +22,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+@Slf4j
 public class CoffeeService {
 
     @Value("${coffee.portion-coefficient.max-value}")
@@ -96,50 +98,56 @@ public class CoffeeService {
     @KafkaListener(topics = "${kafka.topic}")
     public void makeCoffee(OrderDto orderDto) {
 
-        var coffee = coffeeRepository.findByName(orderDto.getCoffeeName());
-        if (coffee == null) {
-            throw new NoSuchElementException("Coffee \"" + orderDto.getCoffeeName() + "\" not found");
-        }
-        var ingredientList = ingredientRepository.findByCoffeeId(coffee.getId());
+        try {
+            var coffee = coffeeRepository.findByName(orderDto.getCoffeeName());
+            if (coffee == null) {
+                throw new NoSuchElementException("Coffee \"" + orderDto.getCoffeeName() + "\" not found");
+            }
+            var ingredientList = ingredientRepository.findByCoffeeId(coffee.getId());
 
         /*
             Составим Map из ингредиентов, которых осталось недостаточно.
             Параллельно будем вычитать из остаточного значения требуемое.
             В случае, если остатков хватать не будет, транзакция откатится
         */
-        Map<String, String> failedIngredientMap = new HashMap<>();
-        for (var ingredient : ingredientList) {
-            var requiredValue = coffeeIngredientTableRepository.getIngredientValueByIds(
-                    coffee.getId(),
-                    ingredient.getId()
-            ) * orderDto.getPortionCoefficient();
-            var residualValue = ingredient.getResidualValue();
-            if (residualValue < requiredValue) {
-                failedIngredientMap.put(
-                        ingredient.getIngredientName(),
-                        residualValue + "  " + ingredient.getMeasurement().getName()
-                );
+            Map<String, String> failedIngredientMap = new HashMap<>();
+            for (var ingredient : ingredientList) {
+                var requiredValue = coffeeIngredientTableRepository.getIngredientValueByIds(
+                        coffee.getId(),
+                        ingredient.getId()
+                ) * orderDto.getPortionCoefficient();
+                var residualValue = ingredient.getResidualValue();
+                if (residualValue < requiredValue) {
+                    failedIngredientMap.put(
+                            ingredient.getIngredientName(),
+                            residualValue + "  " + ingredient.getMeasurement().getName()
+                    );
+                } else {
+                    ingredient.setResidualValue(residualValue - requiredValue);
+                }
             }
-            ingredient.setResidualValue(residualValue - requiredValue);
-        }
 
-        // Проверим, есть ли такие ингредиенты
-        if (!failedIngredientMap.isEmpty()) {
-            StringBuilder context = new StringBuilder("There is not enough ingredients to make a coffee:\n");
-            for (var ingredientName : failedIngredientMap.keySet()) {
-                context.append(ingredientName)
-                        .append(": ")
-                        .append(failedIngredientMap.get(ingredientName))
-                        .append(" left\n");
+            // Проверим, есть ли такие ингредиенты
+            if (!failedIngredientMap.isEmpty()) {
+                StringBuilder context = new StringBuilder("There is not enough ingredients to make a coffee:\n");
+                for (var ingredientName : failedIngredientMap.keySet()) {
+                    context.append(ingredientName)
+                            .append(": ")
+                            .append(failedIngredientMap.get(ingredientName))
+                            .append(" left\n");
+                }
+                throw new RuntimeException(context.toString());
             }
-            throw new RuntimeException(context.toString());
-        }
 
-        // Составим и сохраним заказ
-        Order order = new Order();
-        order.setCoffee(coffee);
-        order.setPortionCoefficient(orderDto.getPortionCoefficient());
-        orderRepository.save(order);
+            // Составим и сохраним заказ
+            Order order = new Order();
+            order.setCoffee(coffee);
+            order.setPortionCoefficient(orderDto.getPortionCoefficient());
+            orderRepository.save(order);
+        } catch (Exception ex) {
+            log.error("Error while sending coffee order", ex);
+            // Возврат средств
+        }
     }
 
     public void saveRecipe(RecipeDto recipeDto) {

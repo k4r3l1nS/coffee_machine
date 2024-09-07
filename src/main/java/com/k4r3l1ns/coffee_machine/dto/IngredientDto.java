@@ -16,7 +16,7 @@ public class IngredientDto {
 
     public void throwIfInvalid() {
         if (name == null || name.isEmpty() || measurement == null || measurement.isEmpty()) {
-            throw new RuntimeException("Invalid ingredient");
+            throw new IllegalArgumentException("Invalid ingredient");
         }
     }
 }

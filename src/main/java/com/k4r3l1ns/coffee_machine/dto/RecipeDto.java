@@ -29,7 +29,7 @@ public class RecipeDto {
                 volume <= 0 || price <= 0 ||
                 ingredients == null || ingredients.isEmpty()
         ) {
-            throw new RuntimeException("Recipe is invalid");
+            throw new IllegalArgumentException("Recipe is invalid");
         }
 
         for (var ingredientName : ingredients.keySet()) {
@@ -37,7 +37,7 @@ public class RecipeDto {
                     ingredients.get(ingredientName) == null || ingredients.get(ingredientName) <= 0 ||
                     ingredientName.matches("\\d+")
             ) {
-                throw new RuntimeException("Invalid ingredient: " + ingredientName);
+                throw new IllegalArgumentException("Invalid ingredient: " + ingredientName);
             }
         }
     }

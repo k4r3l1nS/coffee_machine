@@ -1,6 +1,6 @@
 spring:
 
-  #Сервер брокера Apache Kafka
+  # Apache Kafka broker location
   kafka:
     bootstrap-servers: kafka:29092
 
@@ -29,6 +29,14 @@ ingredient:
   url: api/v1/ingredient
 statistics:
   url: api/v1/stats
+auth:
+  url: api/v1/auth
 
+# Handled kafka topic
 kafka:
   topic: coffee
+
+# JWT signing key
+token:
+  signing:
+    key: 53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855

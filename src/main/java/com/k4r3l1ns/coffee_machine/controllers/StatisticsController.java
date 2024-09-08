@@ -29,7 +29,8 @@ public class StatisticsController {
                             responseCode = "200",
                             description = "Успешный ответ",
                             content = @Content(schema = @Schema(implementation = List.class))
-                    )
+                    ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён")
             })
     @GetMapping("/most-ordered-coffee")
     public ResponseEntity<List<StatisticsDto>> getMostOrderedCoffee(
@@ -46,7 +47,8 @@ public class StatisticsController {
                             responseCode = "200",
                             description = "Успешный ответ",
                             content = @Content(schema = @Schema(implementation = List.class))
-                    )
+                    ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён")
             })
     @GetMapping("/most-profitable-coffee")
     public ResponseEntity<List<StatisticsDto>> getProfitableCoffee(
@@ -63,7 +65,8 @@ public class StatisticsController {
                             responseCode = "200",
                             description = "Успешный ответ",
                             content = @Content(schema = @Schema(implementation = List.class))
-                    )
+                    ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён")
             })
     @GetMapping("/most-served-coffee")
     public ResponseEntity<List<StatisticsDto>> getMostServedCoffee(

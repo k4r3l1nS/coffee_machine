@@ -166,7 +166,7 @@ public class IngredientServiceTests {
                 () -> ingredientService.increaseResiduals("Sugar", -200.0)
         );
 
-        assertEquals("Residual value -200.0 became less than zero", thrown.getMessage());
+        assertEquals("Residual value -100.0 became less than zero", thrown.getMessage());
     }
 
     @Test

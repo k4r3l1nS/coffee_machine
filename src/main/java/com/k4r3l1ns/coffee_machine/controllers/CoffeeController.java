@@ -34,9 +34,10 @@ public class CoffeeController {
                                     mediaType = MediaType.APPLICATION_JSON_VALUE
                             )
                     ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
                     @ApiResponse(responseCode = "404", description = "Кофе не найден")
             })
-    @GetMapping
+    @GetMapping("/info")
     public ResponseEntity<CoffeeInfo> getCoffeeInfo(
             @RequestParam(name = "name") String name
     ) {
@@ -100,6 +101,7 @@ public class CoffeeController {
                                     mediaType = MediaType.APPLICATION_JSON_VALUE
                             )
                     ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
                     @ApiResponse(responseCode = "404", description = "Название кофе не существует в БД")
             })
     @DeleteMapping

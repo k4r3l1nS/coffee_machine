@@ -68,7 +68,9 @@ public class IngredientService {
             throw new NoSuchElementException("Ingredient " + ingredientName + " does not exist");
         }
         if (ingredient.getResidualValue() + incrementedAmount < 0) {
-            throw new RuntimeException("Residual value " + incrementedAmount + " became less than zero");
+            throw new RuntimeException(
+                    "Residual value " + (ingredient.getResidualValue() + incrementedAmount) + " became less than zero"
+            );
         }
         ingredient.setResidualValue(ingredient.getResidualValue() + incrementedAmount);
     }

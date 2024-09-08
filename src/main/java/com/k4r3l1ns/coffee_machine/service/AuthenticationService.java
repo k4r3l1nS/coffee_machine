@@ -26,6 +26,8 @@ public class AuthenticationService {
      */
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
 
+        request.throwIfInvalid();
+
         var user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -45,6 +47,7 @@ public class AuthenticationService {
      * @return токен
      */
     public JwtAuthenticationResponse signIn(SignInRequest request) {
+        request.throwIfInvalid();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getUsername(),
                 request.getPassword()

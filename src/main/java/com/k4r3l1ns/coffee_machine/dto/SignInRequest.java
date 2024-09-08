@@ -1,6 +1,5 @@
 package com.k4r3l1ns.coffee_machine.dto;
 
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -9,9 +8,16 @@ import lombok.*;
 @AllArgsConstructor
 public class SignInRequest {
 
-    @Size(min = 3, max = 24, message = "Username must consist of 3-24 characters")
     private String username;
 
-    @Size(max = 255, message = "Username must consist of no more than 255 characters")
     private String password;
+
+    public void throwIfInvalid() {
+        if (
+                username == null || password == null ||
+                username.length() < 3 || username.length() > 24 || password.length() < 3 || password.length() > 255
+        ) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+    }
 }

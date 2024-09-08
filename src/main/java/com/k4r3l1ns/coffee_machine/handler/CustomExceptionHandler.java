@@ -1,5 +1,6 @@
 package com.k4r3l1ns.coffee_machine.handler;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +44,18 @@ public class CustomExceptionHandler {
                 "Invalid request",
                 ex.getClass(),
                 ex.getMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        var response = new ExceptionResponse(
+                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid request",
+                ex.getClass(),
+                "Proceeded data is not valid"
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

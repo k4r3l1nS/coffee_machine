@@ -49,17 +49,15 @@ public class StatisticsServiceTests {
 
     @Test
     void testMostProfitableCoffee() {
-        // Arrange
+
         int count = 3;
         var statisticsEntity = new Statistics();
         var statisticsDto = new StatisticsDto();
         when(statisticsRepository.mostProfitableCoffee(count)).thenReturn(List.of(statisticsEntity));
         when(statisticsMapper.toDto(statisticsEntity)).thenReturn(statisticsDto);
 
-        // Act
         List<StatisticsDto> result = statisticsService.mostProfitableCoffee(count);
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(statisticsDto, result.get(0));
@@ -70,17 +68,15 @@ public class StatisticsServiceTests {
 
     @Test
     void testMostServedCoffee() {
-        // Arrange
+
         int count = 2;
         var statisticsEntity = new Statistics();
         var statisticsDto = new StatisticsDto();
         when(statisticsRepository.mostServedCoffee(count)).thenReturn(List.of(statisticsEntity));
         when(statisticsMapper.toDto(statisticsEntity)).thenReturn(statisticsDto);
 
-        // Act
         List<StatisticsDto> result = statisticsService.mostServedCoffee(count);
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(statisticsDto, result.get(0));

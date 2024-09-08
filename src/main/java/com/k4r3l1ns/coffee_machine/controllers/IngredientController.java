@@ -33,6 +33,7 @@ public class IngredientController {
                             )
                     ),
                     @ApiResponse(responseCode = "400", description = "Ингредиент содержит невалидные данные"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Ингредиент имеет несуществующую единицу измерения"
@@ -62,6 +63,7 @@ public class IngredientController {
                             responseCode = "400",
                             description = "Ингредиент используется в рецептах и не может быть удалён"
                     ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Ингредиент не найден"
@@ -91,6 +93,7 @@ public class IngredientController {
                             responseCode = "400",
                             description = "Остаток ингредиента становится меньше 0"
                     ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Ингредиент не найден"
@@ -120,6 +123,7 @@ public class IngredientController {
                                     mediaType = MediaType.APPLICATION_JSON_VALUE
                             )
                     ),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Ингредиент не найден"

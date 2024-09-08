@@ -1,9 +1,12 @@
 package com.k4r3l1ns.coffee_machine.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.k4r3l1ns.coffee_machine.config.NoSecurityConfig;
 import com.k4r3l1ns.coffee_machine.dto.IngredientDto;
 import com.k4r3l1ns.coffee_machine.handler.CustomExceptionHandler;
 import com.k4r3l1ns.coffee_machine.service.IngredientService;
+import com.k4r3l1ns.coffee_machine.service.JwtService;
+import com.k4r3l1ns.coffee_machine.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +25,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(IngredientController.class)
-@Import(CustomExceptionHandler.class)
+@Import({CustomExceptionHandler.class, NoSecurityConfig.class})
 public class IngredientControllerTests {
 
     @MockBean
     private IngredientService ingredientService;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private UserService userService;
 
     @Autowired
     private MockMvc mockMvc;

@@ -13,7 +13,7 @@ services:
       postgres:
         condition: service_started
     restart: unless-stopped
-    command: /bin/sh -c "sleep 5 && ./mvnw spring-boot:run"
+    command: /bin/sh -c "sleep 5 && java -jar coffee_machine-0.0.1-SNAPSHOT.jar"
 
   postgres:
     container_name: postgres_db

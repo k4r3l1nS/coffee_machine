@@ -1,13 +1,21 @@
-# Используем JDK 17 с базой Alpine
-FROM eclipse-temurin:17-jdk-alpine
+# Stage 1: Build
+FROM eclipse-temurin:17-jdk-alpine AS build
 
-# Указываем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем файлы проекта в контейнер
-COPY . .
+COPY .mvn/ .mvn
+COPY mvnw mvnw
+COPY pom.xml .
 
-# Собираем и запускаем приложение
-RUN ./mvnw clean package
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+RUN ./mvnw package -DskipTests
 
-CMD ["java", "-jar", "target/coffee_machine-0.0.1-SNAPSHOT.jar"]
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/coffee_machine-0.0.1-SNAPSHOT.jar .
+
+CMD ["java", "-jar", "coffee_machine-0.0.1-SNAPSHOT.jar"]

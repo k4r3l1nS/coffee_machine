@@ -28,7 +28,7 @@ public class IngredientService {
                     "Measurement " + ingredientDto.getMeasurement() + " does not exist"
             );
         }
-        if (ingredientRepository.existsByIngredientName(ingredientDto.getName())) {
+        if (ingredientRepository.existsByIngredientNameIgnoreCase(ingredientDto.getName())) {
             throw new RuntimeException("Ingredient " + ingredientDto.getName() + " already exists");
         }
 
@@ -43,14 +43,14 @@ public class IngredientService {
 
     public void delete(String name) {
 
-        if (!ingredientRepository.existsByIngredientName(name)) {
+        if (!ingredientRepository.existsByIngredientNameIgnoreCase(name)) {
             throw new NoSuchElementException("Ingredient " + name + " does not exist");
         }
-        var ingredient = ingredientRepository.findByIngredientName(name);
+        var ingredient = ingredientRepository.findByIngredientNameIgnoreCase(name);
         if (coffeeIngredientTableRepository.existsByIngredient(ingredient)) {
             throw new RuntimeException("Ingredient " + name + " is used in recipies and cannot be deleted");
         }
-        ingredientRepository.deleteByIngredientName(name);
+        ingredientRepository.deleteByIngredientNameIgnoreCase(name);
     }
 
     /**
@@ -63,7 +63,7 @@ public class IngredientService {
             String ingredientName,
             double incrementedAmount
     ) {
-        var ingredient = ingredientRepository.findByIngredientName(ingredientName);
+        var ingredient = ingredientRepository.findByIngredientNameIgnoreCase(ingredientName);
         if (ingredient == null) {
             throw new NoSuchElementException("Ingredient " + ingredientName + " does not exist");
         }
@@ -76,7 +76,7 @@ public class IngredientService {
     }
 
     public String getResiduals(String ingredientName) {
-        var ingredient = ingredientRepository.findByIngredientName(ingredientName);
+        var ingredient = ingredientRepository.findByIngredientNameIgnoreCase(ingredientName);
         if (ingredient == null) {
             throw new NoSuchElementException("Ingredient " + ingredientName + " does not exist");
         }

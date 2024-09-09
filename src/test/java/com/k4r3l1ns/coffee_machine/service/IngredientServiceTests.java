@@ -43,7 +43,7 @@ public class IngredientServiceTests {
         measurement.setName("GRAMS");
 
         when(measurementRepository.existsByName("GRAMS")).thenReturn(true);
-        when(ingredientRepository.existsByIngredientName("Sugar")).thenReturn(false);
+        when(ingredientRepository.existsByIngredientNameIgnoreCase("Sugar")).thenReturn(false);
         when(measurementRepository.findByName("GRAMS")).thenReturn(measurement);
 
         ingredientService.save(ingredientDto);
@@ -74,7 +74,7 @@ public class IngredientServiceTests {
         ingredientDto.setMeasurement("grams");
 
         when(measurementRepository.existsByName("GRAMS")).thenReturn(true);
-        when(ingredientRepository.existsByIngredientName("Sugar")).thenReturn(true);
+        when(ingredientRepository.existsByIngredientNameIgnoreCase("Sugar")).thenReturn(true);
 
         RuntimeException thrown = assertThrows(
                 RuntimeException.class,
@@ -89,18 +89,18 @@ public class IngredientServiceTests {
         Ingredient ingredient = new Ingredient();
         ingredient.setIngredientName("Sugar");
 
-        when(ingredientRepository.existsByIngredientName("Sugar")).thenReturn(true);
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(ingredient);
+        when(ingredientRepository.existsByIngredientNameIgnoreCase("Sugar")).thenReturn(true);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(ingredient);
         when(coffeeIngredientTableRepository.existsByIngredient(ingredient)).thenReturn(false);
 
         ingredientService.delete("Sugar");
 
-        verify(ingredientRepository, times(1)).deleteByIngredientName("Sugar");
+        verify(ingredientRepository, times(1)).deleteByIngredientNameIgnoreCase("Sugar");
     }
 
     @Test
     void testDeleteIngredientNotFound() {
-        when(ingredientRepository.existsByIngredientName("Sugar")).thenReturn(false);
+        when(ingredientRepository.existsByIngredientNameIgnoreCase("Sugar")).thenReturn(false);
 
         NoSuchElementException thrown = assertThrows(
                 NoSuchElementException.class,
@@ -115,8 +115,8 @@ public class IngredientServiceTests {
         Ingredient ingredient = new Ingredient();
         ingredient.setIngredientName("Sugar");
 
-        when(ingredientRepository.existsByIngredientName("Sugar")).thenReturn(true);
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(ingredient);
+        when(ingredientRepository.existsByIngredientNameIgnoreCase("Sugar")).thenReturn(true);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(ingredient);
         when(coffeeIngredientTableRepository.existsByIngredient(ingredient)).thenReturn(true);
 
         RuntimeException thrown = assertThrows(
@@ -133,17 +133,17 @@ public class IngredientServiceTests {
         ingredient.setIngredientName("Sugar");
         ingredient.setResidualValue(100.0);
 
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(ingredient);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(ingredient);
 
         ingredientService.increaseResiduals("Sugar", 50.0);
 
         assertEquals(150.0, ingredient.getResidualValue());
-        verify(ingredientRepository, times(1)).findByIngredientName("Sugar");
+        verify(ingredientRepository, times(1)).findByIngredientNameIgnoreCase("Sugar");
     }
 
     @Test
     void testIncreaseResidualsIngredientNotFound() {
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(null);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(null);
 
         NoSuchElementException thrown = assertThrows(
                 NoSuchElementException.class,
@@ -159,7 +159,7 @@ public class IngredientServiceTests {
         ingredient.setIngredientName("Sugar");
         ingredient.setResidualValue(100.0);
 
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(ingredient);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(ingredient);
 
         RuntimeException thrown = assertThrows(
                 RuntimeException.class,
@@ -178,7 +178,7 @@ public class IngredientServiceTests {
         measurement.setName("grams");
         ingredient.setMeasurement(measurement);
 
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(ingredient);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(ingredient);
 
         String residuals = ingredientService.getResiduals("Sugar");
 
@@ -187,7 +187,7 @@ public class IngredientServiceTests {
 
     @Test
     void testGetResidualsNotFound() {
-        when(ingredientRepository.findByIngredientName("Sugar")).thenReturn(null);
+        when(ingredientRepository.findByIngredientNameIgnoreCase("Sugar")).thenReturn(null);
 
         NoSuchElementException thrown = assertThrows(
                 NoSuchElementException.class,

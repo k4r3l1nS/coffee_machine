@@ -21,9 +21,9 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     )
     List<Ingredient> findByCoffeeId(@Param("id")Long id);
 
-    boolean existsByIngredientName(String ingredientName);
+    boolean existsByIngredientNameIgnoreCase(String ingredientName);
 
-    Ingredient findByIngredientName(String ingredientName);
+    Ingredient findByIngredientNameIgnoreCase(String ingredientName);
 
-    void deleteByIngredientName(String name);
+    void deleteByIngredientNameIgnoreCase(String name);
 }

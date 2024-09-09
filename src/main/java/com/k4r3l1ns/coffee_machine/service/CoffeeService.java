@@ -49,7 +49,7 @@ public class CoffeeService {
     @Transactional(readOnly = true)
     public CoffeeInfo coffeeInfo(String name) {
 
-        var coffee = coffeeRepository.findByName(name);
+        var coffee = coffeeRepository.findByNameIgnoreCase(name);
         if (coffee == null) {
             throw new NoSuchElementException("Coffee \"" + name + "\" not found");
         }
@@ -69,7 +69,7 @@ public class CoffeeService {
         }
 
         return CoffeeInfo.builder()
-                .name(name)
+                .name(coffee.getName())
                 .description(coffee.getDescription())
                 .volume(coffee.getVolume())
                 .price(price)
@@ -99,7 +99,7 @@ public class CoffeeService {
     public void makeCoffee(OrderDto orderDto) {
 
         try {
-            var coffee = coffeeRepository.findByName(orderDto.getCoffeeName());
+            var coffee = coffeeRepository.findByNameIgnoreCase(orderDto.getCoffeeName());
             if (coffee == null) {
                 throw new NoSuchElementException("Coffee \"" + orderDto.getCoffeeName() + "\" not found");
             }
@@ -155,7 +155,7 @@ public class CoffeeService {
         // Проверка на корректность данных
         recipeDto.throwIfInvalid();
         for (var ingredientName : recipeDto.getIngredients().keySet()) {
-            if (!ingredientRepository.existsByIngredientName(ingredientName)) {
+            if (!ingredientRepository.existsByIngredientNameIgnoreCase(ingredientName)) {
                 throw new NoSuchElementException("Ingredient \"" + ingredientName + "\" not found");
             }
         }
@@ -178,7 +178,7 @@ public class CoffeeService {
             var coffeeIngredientTable = new CoffeeIngredientTable();
             coffeeIngredientTable.setCoffee(coffee);
             coffeeIngredientTable.setIngredient(
-                    ingredientRepository.findByIngredientName(ingredientName)
+                    ingredientRepository.findByIngredientNameIgnoreCase(ingredientName)
             );
             coffeeIngredientTable.setIngredientValue(recipeDto.getIngredients().get(ingredientName));
             coffeeIngredientTableRepository.save(coffeeIngredientTable);
@@ -186,9 +186,9 @@ public class CoffeeService {
     }
 
     public void deleteRecipe(String name) {
-        if (!coffeeRepository.existsByName(name)) {
+        if (!coffeeRepository.existsByNameIgnoreCase(name)) {
             throw new NoSuchElementException("Coffee \"" + name + "\" not found");
         }
-        coffeeRepository.deleteByName(name);
+        coffeeRepository.deleteByNameIgnoreCase(name);
     }
 }

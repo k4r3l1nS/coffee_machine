@@ -63,7 +63,7 @@ public class CoffeeServiceTests {
         CoffeeIngredientTable coffeeIngredientTable = new CoffeeIngredientTable();
         coffeeIngredientTable.setIngredientValue(100);
 
-        when(coffeeRepository.findByName(coffeeName)).thenReturn(coffee);
+        when(coffeeRepository.findByNameIgnoreCase(coffeeName)).thenReturn(coffee);
         when(priceListRepository.findByCoffeeId(coffee.getId())).thenReturn(priceList);
         when(ingredientRepository.findByCoffeeId(coffee.getId())).thenReturn(Collections.singletonList(ingredient));
         when(coffeeIngredientTableRepository.getIngredientValueByIds(coffee.getId(), ingredient.getId()))
@@ -103,7 +103,7 @@ public class CoffeeServiceTests {
         CoffeeIngredientTable coffeeIngredientTable = new CoffeeIngredientTable();
         coffeeIngredientTable.setIngredientValue(10000);
 
-        when(coffeeRepository.findByName(orderDto.getCoffeeName())).thenReturn(new Coffee());
+        when(coffeeRepository.findByNameIgnoreCase(orderDto.getCoffeeName())).thenReturn(new Coffee());
         when(ingredientRepository.findByCoffeeId(coffee.getId())).thenReturn(Collections.singletonList(ingredient));
         when(coffeeIngredientTableRepository.getIngredientValueByIds(coffee.getId(), ingredient.getId()))
                 .thenReturn(coffeeIngredientTable.getIngredientValue());
@@ -132,7 +132,7 @@ public class CoffeeServiceTests {
         recipeDto.setPrice(5);
         recipeDto.setIngredients(Map.of("Milk", 100.0));
 
-        when(ingredientRepository.existsByIngredientName("Milk")).thenReturn(true);
+        when(ingredientRepository.existsByIngredientNameIgnoreCase("Milk")).thenReturn(true);
 
         coffeeService.saveRecipe(recipeDto);
 
@@ -144,15 +144,15 @@ public class CoffeeServiceTests {
     @Test
     void testDeleteRecipe() {
         String coffeeName = "Latte";
-        when(coffeeRepository.existsByName(coffeeName)).thenReturn(true);
+        when(coffeeRepository.existsByNameIgnoreCase(coffeeName)).thenReturn(true);
         coffeeService.deleteRecipe(coffeeName);
-        verify(coffeeRepository, times(1)).deleteByName(coffeeName);
+        verify(coffeeRepository, times(1)).deleteByNameIgnoreCase(coffeeName);
     }
 
     @Test
     void testDeleteRecipeNotFound() {
         String coffeeName = "Latte";
-        when(coffeeRepository.existsByName(coffeeName)).thenReturn(false);
+        when(coffeeRepository.existsByNameIgnoreCase(coffeeName)).thenReturn(false);
         Exception ex = assertThrows(
                 NoSuchElementException.class,
                 () -> coffeeService.deleteRecipe(coffeeName)

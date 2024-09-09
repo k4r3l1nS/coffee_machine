@@ -56,7 +56,7 @@ public class CoffeeControllerTests {
 
         when(coffeeService.coffeeInfo("Latte")).thenReturn(coffeeInfo);
 
-        mockMvc.perform(get("/api/v1/coffee?name=Latte")
+        mockMvc.perform(get("/api/v1/coffee/info?name=Latte")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -73,7 +73,7 @@ public class CoffeeControllerTests {
     void testGetCoffeeInfoNotFound() throws Exception {
         when(coffeeService.coffeeInfo(anyString())).thenThrow(new NoSuchElementException("Coffee not found"));
 
-        mockMvc.perform(get("/api/v1/coffee?name=Latte")
+        mockMvc.perform(get("/api/v1/coffee/info?name=Latte")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +107,6 @@ public class CoffeeControllerTests {
                         )
                 );
     }
-
 
     @Test
     void testMakeCoffeeBadRequest() throws Exception {

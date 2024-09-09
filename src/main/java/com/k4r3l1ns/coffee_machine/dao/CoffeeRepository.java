@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CoffeeRepository extends JpaRepository<Coffee, Long> {
-    Coffee findByName(String name);
-    void deleteByName(String name);
-    boolean existsByName(String name);
+    Coffee findByNameIgnoreCase(String name);
+    void deleteByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
 }

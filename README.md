@@ -74,9 +74,9 @@
 
 ## Usage
 - Доступ к приложению можно получить по адресу `http://localhost:8080`.
-- UI приложения доступен по адресу `http://localhost:8080/swagger-ui.html` и реализован средствами Swagger. Интерфейс
+- UI приложения доступен по адресу `http://localhost:8080/swagger-ui/index.html` и реализован средствами Swagger. Интерфейс
   содержит необходимые средства для изучения доступных эндпойнтов и их использования.
 
 ## API Documentation
 API задокументирован с использованием OpenAPI и доступен по адресу:
-`http://localhost:8080/swagger-ui.html`
+`http://localhost:8080/swagger-ui/index.html`

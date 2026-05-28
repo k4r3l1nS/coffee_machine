@@ -19,8 +19,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     
-    @Value("${token.signing.key}")
-    private String jwtSigningKey;
+    private final String jwtSigningKey;
+
+    public JwtService(@Value("${token.signing.key}") String jwtSigningKey) {
+        this.jwtSigningKey = jwtSigningKey;
+    }
 
     /**
      * Извлечение имени пользователя из токена

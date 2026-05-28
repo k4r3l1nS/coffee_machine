@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "${env.BRANCH_NAME}",
-                        url: 'YOUR_GIT_REPOSITORY_URL'
+                        url: 'https://github.com/k4r3l1ns/coffee_machine.git'
             }
         }
 

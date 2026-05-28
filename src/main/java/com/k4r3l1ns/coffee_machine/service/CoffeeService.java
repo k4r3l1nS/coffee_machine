@@ -26,10 +26,10 @@ import java.util.*;
 public class CoffeeService {
 
     @Value("${coffee.portion-coefficient.max-value}")
-    private double maxPortionValue;
+    private final double maxPortionValue;
 
     @Value("${kafka.topic}")
-    private String topic;
+    private final String topic;
 
     private final KafkaTemplate<Object, Object> kafkaTemplate;
 

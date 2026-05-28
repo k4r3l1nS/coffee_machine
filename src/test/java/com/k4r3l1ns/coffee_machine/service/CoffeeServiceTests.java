@@ -8,15 +8,17 @@ import com.k4r3l1ns.coffee_machine.dto.CoffeeInfo;
 import com.k4r3l1ns.coffee_machine.dto.OrderDto;
 import com.k4r3l1ns.coffee_machine.dto.RecipeDto;
 import com.k4r3l1ns.coffee_machine.models.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -37,8 +39,24 @@ public class CoffeeServiceTests {
     @Mock
     private OrderRepository orderRepository;
 
-    @InjectMocks
+    @Mock
+    private KafkaTemplate<Object, Object> kafkaTemplate;
+
     private CoffeeService coffeeService;
+
+    @BeforeEach
+    public void setUp() {
+        coffeeService = new CoffeeService(
+                1.0,
+                "coffee-topic",
+                kafkaTemplate,
+                coffeeRepository,
+                priceListRepository,
+                ingredientRepository,
+                coffeeIngredientTableRepository,
+                orderRepository
+        );
+    }
 
     @Test
     void testCoffeeInfo() {
@@ -81,45 +99,91 @@ public class CoffeeServiceTests {
     }
 
     @Test
-    void testMakeCoffee() {
-        OrderDto orderDto = new OrderDto();
-        orderDto.setCoffeeName("Latte");
-        orderDto.setPortionCoefficient(2.0);
-
+    void makeCoffee_shouldSaveOrder() {
         Coffee coffee = new Coffee();
         coffee.setId(1L);
-        coffee.setName("Espresso");
 
         Measurement measurement = new Measurement();
-        measurement.setName("ML");
-        measurement.setContext("Millilitres");
+        measurement.setName("ml");
 
         Ingredient ingredient = new Ingredient();
-        ingredient.setId(1L);
+        ingredient.setId(2L);
         ingredient.setIngredientName("Milk");
-        ingredient.setResidualValue(5000);
+        ingredient.setResidualValue(500.0);
         ingredient.setMeasurement(measurement);
 
-        CoffeeIngredientTable coffeeIngredientTable = new CoffeeIngredientTable();
-        coffeeIngredientTable.setIngredientValue(10000);
+        OrderDto dto = new OrderDto();
+        dto.setCoffeeName("Latte");
+        dto.setPortionCoefficient(2.0);
 
-        when(coffeeRepository.findByNameIgnoreCase(orderDto.getCoffeeName())).thenReturn(new Coffee());
-        when(ingredientRepository.findByCoffeeId(coffee.getId())).thenReturn(Collections.singletonList(ingredient));
-        when(coffeeIngredientTableRepository.getIngredientValueByIds(coffee.getId(), ingredient.getId()))
-                .thenReturn(coffeeIngredientTable.getIngredientValue());
+        when(coffeeRepository.findByNameIgnoreCase("Latte"))
+                .thenReturn(coffee);
+        when(ingredientRepository.findByCoffeeId(1L))
+                .thenReturn(List.of(ingredient));
+        when(coffeeIngredientTableRepository.getIngredientValueByIds(1L, 2L))
+                .thenReturn(100.0);
 
-        coffeeService.makeCoffee(orderDto);
+        coffeeService.makeCoffee(dto);
 
-        verify(orderRepository, times(1)).save(any(Order.class));
+        assertEquals(300.0, ingredient.getResidualValue());
+        verify(orderRepository).save(any(Order.class));
     }
 
     @Test
-    void testSendToQueue() {
-        OrderDto orderDto = new OrderDto();
-        orderDto.setCoffeeName("Latte");
-        orderDto.setPortionCoefficient(2.0);
+    void makeCoffee_shouldNotSaveOrderWhenIngredientsNotEnough() {
+        Coffee coffee = new Coffee();
+        coffee.setId(1L);
 
-        assertThrows(IllegalArgumentException.class, () -> coffeeService.sendToQueue(orderDto));
+        Measurement measurement = new Measurement();
+        measurement.setName("ml");
+
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(2L);
+        ingredient.setIngredientName("Milk");
+        ingredient.setResidualValue(50.0);
+        ingredient.setMeasurement(measurement);
+
+        OrderDto dto = new OrderDto();
+        dto.setCoffeeName("Latte");
+        dto.setPortionCoefficient(1.0);
+
+        when(coffeeRepository.findByNameIgnoreCase("Latte"))
+                .thenReturn(coffee);
+        when(ingredientRepository.findByCoffeeId(1L))
+                .thenReturn(List.of(ingredient));
+        when(coffeeIngredientTableRepository.getIngredientValueByIds(1L, 2L))
+                .thenReturn(100.0);
+
+        coffeeService.makeCoffee(dto);
+
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void sendToQueue_shouldSendMessage() {
+        OrderDto dto = new OrderDto();
+        dto.setCoffeeName("Latte");
+        dto.setPortionCoefficient(1.0);
+
+        when(kafkaTemplate.send(anyString(), any())).thenReturn(mock(CompletableFuture.class));
+
+        coffeeService.sendToQueue(dto);
+
+        verify(kafkaTemplate).send("coffee-topic", dto);
+    }
+
+    @Test
+    void sendToQueue_shouldThrowForInvalidPortion() {
+        OrderDto dto = new OrderDto();
+        dto.setCoffeeName("Latte");
+        dto.setPortionCoefficient(10.0);
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> coffeeService.sendToQueue(dto)
+        );
+
+        verifyNoInteractions(kafkaTemplate);
     }
 
     @Test
